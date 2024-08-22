@@ -62,6 +62,8 @@ typedef struct	s_token
 void display_prompt();
 void shell_loop();
 
+void	ft_skip_space(const char *str, int *i);
+
 //Tokenisation
 
 // void	squish_args(t_mini *mini);
