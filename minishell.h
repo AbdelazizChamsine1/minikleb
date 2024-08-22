@@ -12,6 +12,9 @@
 # include <limits.h>
 # include <errno.h>
 # include <signal.h>
+#include <readline/readline.h>
+#include <readline/history.h>
+
 
 # define EMPTY 0
 # define CMD 1
@@ -39,10 +42,22 @@
 typedef struct	s_token
 {
 	char			*str;
-	int				type;
+	int		type;
 	struct s_token	*prev;
 	struct s_token	*next;
 }				t_token;
+
+// typedef enum e_tokens
+// {
+// 	TOKEN_PIPE,
+// 	TOKEN_TRUNC,
+// 	TOKEN_WORD,
+// 	TOKEN_IN,
+// 	TOKEN_OUT,
+// 	TOKEN_HEREDOC,
+// 	TOKEN_APPEND,
+// 	TOKEN_EOF
+// }	t_tokens;
 
 void display_prompt();
 void shell_loop();
