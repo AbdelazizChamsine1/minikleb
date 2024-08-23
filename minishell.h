@@ -62,7 +62,10 @@ typedef struct	s_token
 void display_prompt();
 void shell_loop();
 
+int ignore_sep(char *line, int i);
+void ft_skip_space(const char *str, int *i);
 void	ft_skip_space(const char *str, int *i);
+void type_arg(t_token *token, int separator);
 
 //Tokenisation
 

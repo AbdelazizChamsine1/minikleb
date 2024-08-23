@@ -1,4 +1,11 @@
 #include "minishell.h"
+#include <stdlib.h>
+#include <unistd.h>
+#include <signal.h>
+#include <stdio.h>
+#include <string.h>
+#include <readline/readline.h>
+#include <readline/history.h>
 
 void display_prompt() {
     write(STDERR_FILENO, "\033[0;92m\033[1mminishell ▸ \033[0m", 30);
@@ -24,6 +31,7 @@ void shell_loop() {
 
     signal(SIGINT, handle_sigint);
     signal(SIGQUIT, SIG_IGN);
+
     while (1) {
         input = readline("\033[0;92m\033[1mminishell ▸ \033[0m");
         if (!input) {
@@ -34,6 +42,7 @@ void shell_loop() {
             free(input);
             continue;
         }
+
         i = 0;
         ft_skip_space(input, &i);
         char *trimmed_input = input + i;
@@ -46,6 +55,14 @@ void shell_loop() {
             free(input);
             break;
         }
+
+        if (strcmp(trimmed_input, "clear") == 0) {
+            // Clear the screen
+            system("clear");
+            free(input);
+            continue;
+        }
+
         add_history(input);
         tokens = get_tokens(input);
         display_tokens(tokens);
