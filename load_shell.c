@@ -7,14 +7,12 @@
 #include <readline/readline.h>
 #include <readline/history.h>
 
-void display_prompt() {
-    write(STDERR_FILENO, "\033[0;92m\033[1mminishell ▸ \033[0m", 30);
-}
-
 void handle_sigint(int sig) {
-    (void)sig; 
+    (void)sig;
     write(STDERR_FILENO, "\n", 1);
-    display_prompt();
+    rl_on_new_line();
+    rl_replace_line("", 0);
+    rl_redisplay();
 }
 
 void display_tokens(t_token *token) {
@@ -24,13 +22,30 @@ void display_tokens(t_token *token) {
     }
 }
 
+int check_quotes(const char *input) {
+    int single_quote = 0;
+    int double_quote = 0;
+
+    while (*input) {
+        if (*input == '\'' && double_quote == 0)
+            single_quote = !single_quote;
+        else if (*input == '"' && single_quote == 0)
+            double_quote = !double_quote;
+        input++;
+    }
+    if (single_quote || double_quote) {
+        return (0); 
+    }
+    return (1); 
+}
+
 void shell_loop() {
     char *input = NULL;
     t_token *tokens;
     int i;
 
     signal(SIGINT, handle_sigint);
-    signal(SIGQUIT, SIG_IGN);
+    signal(SIGQUIT, SIG_IGN);   
 
     while (1) {
         input = readline("\033[0;92m\033[1mminishell ▸ \033[0m");
@@ -42,7 +57,6 @@ void shell_loop() {
             free(input);
             continue;
         }
-
         i = 0;
         ft_skip_space(input, &i);
         char *trimmed_input = input + i;
@@ -50,21 +64,22 @@ void shell_loop() {
         while (end > trimmed_input && *end == ' ')
             end--;
         end[1] = '\0';
-
         if (strcmp(trimmed_input, "exit") == 0) {
             free(input);
             break;
         }
-
         if (strcmp(trimmed_input, "clear") == 0) {
-            // Clear the screen
             system("clear");
             free(input);
             continue;
         }
-
         add_history(input);
-        tokens = get_tokens(input);
+        if (!check_quotes(input)) {
+            printf("Error: Unmatched quotes\n");
+            free(input);
+            continue;
+        }
+        tokens = get_tokens(trimmed_input);
         display_tokens(tokens);
         while (tokens) {
             t_token *temp = tokens;
@@ -75,3 +90,4 @@ void shell_loop() {
         free(input);
     }
 }
+

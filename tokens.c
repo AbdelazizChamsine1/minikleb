@@ -1,28 +1,47 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   tokens.c                                           :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: oismail <marvin@42.fr>                     +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/08/24 09:40:13 by oismail           #+#    #+#             */
+/*   Updated: 2024/08/24 09:43:31 by oismail          ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
-#include <stdio.h> // For debugging purposes
+#include <stdio.h>
 
-static int next_alloc(char *line, int *i) {
-    int count = 0;
-    int j = 0;
-    char c = ' ';
+static int	next_alloc(char *line, int *i)
+{
+	int     count;
+	int     j;
+	char	c;
 
-    while (line[*i + j] && (line[*i + j] != ' ' || c != ' ')) {
-        if (c == ' ' && (line[*i + j] == '\'' || line[*i + j] == '\"')) {
-            c = line[*i + j++];
-        } else if (c != ' ' && line[*i + j] == c) {
-            j++;  // Move past the closing quote
-            break;  // Stop counting at the end of the quoted string
-        } else {
-            j++;
-        }
-        if (line[*i + j - 1] == '\\') {
-            count--;
-        }
-    }
-    return (j - count + 1);
+    count = 0;
+    j = 0;
+    c = ' ';
+	while (line[*i + j] && (line[*i + j] != ' ' || c != ' '))
+	{
+		if (c == ' ' && (line[*i + j] == '\'' || line[*i + j] == '\"'))
+		{
+			c = line[*i + j++];
+		}
+		else if (c != ' ' && line[*i + j] == c)
+		{
+			j++;
+			break ;
+		}
+		else
+			j++;
+		if (line[*i + j - 1] == '\\')
+			count--;
+	}
+	return (j - count + 1);
 }
 
-static t_token *create_special_token(char *line, int *i) {
+static t_token  *create_special_token(char *line, int *i) {
     t_token *token;
     int j = 0;
     if (!(token = malloc(sizeof(t_token)))) {
@@ -105,11 +124,9 @@ t_token *get_tokens(char *line) {
     while (line[i]) {
         sep = ignore_sep(line, i);
         next = next_token(line, &i);
-
         if (!next) {
             continue;
         }
-
         next->prev = prev;
         if (prev) {
             prev->next = next;
@@ -117,7 +134,6 @@ t_token *get_tokens(char *line) {
         prev = next;
         type_arg(next, sep);
     }
-
     if (next) {
         next->next = NULL;
     }

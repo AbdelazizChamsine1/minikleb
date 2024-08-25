@@ -42,6 +42,7 @@
 typedef struct	s_token
 {
 	char			*str;
+	int quotype;
 	int		type;
 	struct s_token	*prev;
 	struct s_token	*next;
