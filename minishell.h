@@ -6,7 +6,7 @@
 /*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 14:13:19 by achamsin          #+#    #+#             */
-/*   Updated: 2024/08/27 14:14:50 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/08/27 15:04:49 by achamsin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -50,11 +50,11 @@ typedef struct s_token
 	struct s_token	*next;
 }				t_token;
 
-typedef struct s_env
-{
-	char			*value;
-	struct s_env	*next;
-}				t_env;
+// typedef struct s_env
+// {
+// 	char			*value;
+// 	struct s_env	*next;
+// }				t_env;
 
 typedef enum e_tokens
 {
@@ -67,6 +67,14 @@ typedef enum e_tokens
 	TOKEN_APPEND,
 	TOKEN_EOF
 }	t_tokens;
+
+typedef struct s_env
+{
+	char			*key;
+	char			*value;
+	int				hidden;
+	struct s_env	*next;
+}	t_env;
 
 void	display_prompt();
 void	shell_loop();

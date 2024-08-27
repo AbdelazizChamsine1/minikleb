@@ -6,7 +6,7 @@
 /*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 13:46:21 by achamsin          #+#    #+#             */
-/*   Updated: 2024/08/27 14:19:46 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/08/27 15:16:08 by achamsin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -18,20 +18,6 @@ int	is_env_char(int c)
 		return (1);
 	return (0);
 }
-
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   env.c                                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: macrespo <macrespo@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2020/06/09 16:01:42 by macrespo          #+#    #+#             */
-/*   Updated: 2020/08/27 17:43:04 by cclaude          ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
-#include "minishell.h"
 
 size_t	size_env(t_env *lst)
 {
@@ -86,7 +72,8 @@ int	env_init(t_mini *mini, char **env_array)
 	t_env	*new;
 	int		i;
 
-	if (!(env = malloc(sizeof(t_env))))
+	env = malloc(sizeof(t_env));
+	if (!env)
 		return (1);
 	env->value = ft_strdup(env_array[0]);
 	env->next = NULL;
