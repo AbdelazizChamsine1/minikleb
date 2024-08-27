@@ -13,6 +13,27 @@
 #include "minishell.h"
 #include <stdio.h>
 
+const char *get_token_type_name(t_tokens type) {
+    switch (type) {
+        case TOKEN_PIPE: return "PIPE";
+        case TOKEN_TRUNC: return "TRUNC";
+        case TOKEN_WORD: return "WORD";
+        case TOKEN_IN: return "IN";
+        case TOKEN_OUT: return "OUT";
+        case TOKEN_HEREDOC: return "HEREDOC";
+        case TOKEN_APPEND: return "APPEND";
+        case TOKEN_EOF: return "EOF";
+        default: return "UNKNOWN";
+    }
+}
+
+void display_tokens(t_token *token) {
+    while (token) {
+        printf("Token: '%s', Type: %s\n", token->str, get_token_type_name(token->type));
+        token = token->next;
+    }
+}
+
 static int	next_alloc(char *line, int *i)
 {
 	int     count;
@@ -72,7 +93,7 @@ static t_token *create_regular_token(char *line, int *i) {
         return NULL;
     }
 
-    while (line[*i] && !strchr("|;<>", line[*i]) && line[*i] != ' ') {
+    while (line[*i] && !strchr("|<>", line[*i]) && line[*i] != ' ') {
         if (line[*i] == '\'' || line[*i] == '\"') {
             if (j > 0) {
                 token->str[j] = '\0';
@@ -108,7 +129,7 @@ static t_token *next_token(char *line, int *i) {
         (*i)++;
     }
 
-    if (strchr("|;<>", line[*i])) {
+    if (strchr("|<>", line[*i])) {
         return create_special_token(line, i);
     } else {
         return create_regular_token(line, i);

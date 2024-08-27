@@ -16,15 +16,6 @@
 #include <readline/history.h>
 
 
-# define EMPTY 0
-# define CMD 1
-# define ARG 2
-# define TRUNC 3
-# define APPEND 4
-# define INPUT 5
-# define PIPE 6
-# define END 7
-
 # define STDIN 0
 # define STDOUT 1
 # define STDERR 2
@@ -48,17 +39,17 @@ typedef struct	s_token
 	struct s_token	*next;
 }				t_token;
 
-// typedef enum e_tokens
-// {
-// 	TOKEN_PIPE,
-// 	TOKEN_TRUNC,
-// 	TOKEN_WORD,
-// 	TOKEN_IN,
-// 	TOKEN_OUT,
-// 	TOKEN_HEREDOC,
-// 	TOKEN_APPEND,
-// 	TOKEN_EOF
-// }	t_tokens;
+typedef enum e_tokens
+{
+	TOKEN_PIPE,
+	TOKEN_TRUNC,
+	TOKEN_WORD,
+	TOKEN_IN,
+	TOKEN_OUT,
+	TOKEN_HEREDOC,
+	TOKEN_APPEND,
+	TOKEN_EOF
+}	t_tokens;
 
 void display_prompt();
 void shell_loop();
@@ -67,6 +58,7 @@ int ignore_sep(char *line, int i);
 void ft_skip_space(const char *str, int *i);
 void	ft_skip_space(const char *str, int *i);
 void type_arg(t_token *token, int separator);
+void display_tokens(t_token *token);
 
 //Tokenisation
 

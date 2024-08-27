@@ -15,13 +15,6 @@ void handle_sigint(int sig) {
     rl_redisplay();
 }
 
-void display_tokens(t_token *token) {
-    while (token) {
-        printf("%s\n", token->str);
-        token = token->next;
-    }
-}
-
 int check_quotes(const char *input) {
     int single_quote = 0;
     int double_quote = 0;
