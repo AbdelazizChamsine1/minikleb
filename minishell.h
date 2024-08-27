@@ -14,6 +14,7 @@
 # include <signal.h>
 #include <readline/readline.h>
 #include <readline/history.h>
+# include "libft/libft.h"
 
 
 # define STDIN 0
@@ -39,6 +40,12 @@ typedef struct	s_token
 	struct s_token	*next;
 }				t_token;
 
+typedef struct	s_env
+{
+	char			*value;
+	struct s_env	*next;
+}				t_env;
+
 typedef enum e_tokens
 {
 	TOKEN_PIPE,
@@ -62,6 +69,8 @@ void display_tokens(t_token *token);
 
 //Tokenisation
 
+//ENV
+int	is_env_char(int c);
 // void	squish_args(t_mini *mini);
 t_token	*get_tokens(char *line);
 
