@@ -76,6 +76,26 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
+typedef struct	s_mini
+{
+	t_token			*start;
+	t_env			*env;
+	t_env			*secret_env;
+	int				in;
+	int				out;
+	int				fdin;
+	int				fdout;
+	int				pipin;
+	int				pipout;
+	int				pid;
+	int				charge;
+	int				parent;
+	int				last;
+	int				ret;
+	int				exit;
+	int				no_exec;
+}				t_mini;
+
 void	display_prompt();
 void	shell_loop();
 int		ignore_sep(char *line, int i);
@@ -84,11 +104,14 @@ void	ft_skip_space(const char *str, int *i);
 void	type_arg(t_token *token, int separator);
 void	display_tokens(t_token *token);
 
-//Tokenisation
-
 //ENV
 int		is_env_char(int c);
 // void	squish_args(t_mini *mini);
 t_token	*get_tokens(char *line);
+int	env_init(t_mini *mini, char **env_array);
+int	secret_env_init(t_mini *mini, char **env_array);
+void				increment_shell_level(t_env *env);
+char	*get_env_value(char *arg, t_env *env);
+void	get_env_name(char *name, const char *env);
 
 #endif

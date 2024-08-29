@@ -2,7 +2,7 @@ NAME = minishell
 CC = gcc
 FLAGS = -Wall -Werror -Wextra
 SRCS = try.c load_shell.c tokens.c tokens_utils.c\
-		get_env.c env.c
+		get_env.c env.c shlvl.c
 
 LDFLAGS = -lreadline
 LIBFT = ./libft/libft.a
