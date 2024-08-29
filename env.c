@@ -66,31 +66,55 @@ char	*env_to_str(t_env *lst)
 	return (env);
 }
 
-int	env_init(t_mini *mini, char **env_array)
+void split_key_value(const char *env_str, char **key, char **value)
 {
-	t_env	*env;
-	t_env	*new;
-	int		i;
+    char **parts;
 
-	env = malloc(sizeof(t_env));
-	if (!env)
-		return (1);
-	env->value = ft_strdup(env_array[0]);
-	env->next = NULL;
-	mini->env = env;
-	i = 1;
-	while (env_array && env_array[0] && env_array[i])
-	{
-		new = malloc(sizeof(t_env));
-		if (!new)
-			return (1);
-		new->value = ft_strdup(env_array[i]);
-		new->next = NULL;
-		env->next = new;
-		env = new;
-		i++;
-	}
-	return (0);
+    parts = ft_split(env_str, '=');
+    if (parts)
+    {
+        *key = ft_strdup(parts[0]);
+        *value = parts[1] ? ft_strdup(parts[1]) : ft_strdup("");
+        for (int i = 0; parts[i]; i++)
+            free(parts[i]);
+        free(parts);
+    }
+    else
+    {
+        *key = ft_strdup(env_str);
+        *value = ft_strdup("");
+    }
+}
+
+int env_init(t_mini *mini, char **env_array)
+{
+    t_env *env;
+    t_env *new;
+    int i;
+
+    // Initialize the first environment variable
+    env = malloc(sizeof(t_env));
+    if (!env)
+        return (1);
+    split_key_value(env_array[0], &env->key, &env->value);
+    env->hidden = 0;   // Default value for hidden
+    env->next = NULL;
+    mini->env = env;
+
+    i = 1;
+    while (env_array && env_array[i])
+    {
+        new = malloc(sizeof(t_env));
+        if (!new)
+            return (1);
+        split_key_value(env_array[i], &new->key, &new->value);
+        new->hidden = 0;  // Default value for hidden
+        new->next = NULL;
+        env->next = new;
+        env = new;
+        i++;
+    }
+    return (0);
 }
 
 int	secret_env_init(t_mini *mini, char **env_array)

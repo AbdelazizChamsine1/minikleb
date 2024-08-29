@@ -12,19 +12,19 @@
 
 #include "minishell.h"
 
-void	get_env_name(char *name, const char *env)
-{
-	int	i;
+// void	get_env_name(char *name, const char *env)
+// {
+// 	int	i;
 
-	name[0] = '\0';
-	i = 0;
-	while (env[i] && env[i] != '=')
-	{
-		name[i] = env[i];
-		i++;
-	}
-	name[i] = '\0';
-}
+// 	name[0] = '\0';
+// 	i = 0;
+// 	while (env[i] && env[i] != '=')
+// 	{
+// 		name[i] = env[i];
+// 		i++;
+// 	}
+// 	name[i] = '\0';
+// }
 
 int	is_valid_env(const char *env)
 {

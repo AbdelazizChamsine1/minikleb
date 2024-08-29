@@ -6,7 +6,7 @@
 /*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 14:13:19 by achamsin          #+#    #+#             */
-/*   Updated: 2024/08/27 15:04:49 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/08/29 10:00:46 by achamsin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -76,6 +76,25 @@ typedef struct s_env
 	struct s_env	*next;
 }	t_env;
 
+// export key=value
+
+// env
+// ...
+// ...
+// key=value
+// export key
+// env
+// ...
+// ...
+// export
+// export ...
+// export ...
+// export key
+// !strchr(str, '=')
+// add_tail(key, NULL, hidden = 1)
+// print_full_env => export
+// print_env => env => no display for hidden nodes
+
 typedef struct	s_mini
 {
 	t_token			*start;
@@ -96,8 +115,15 @@ typedef struct	s_mini
 	int				no_exec;
 }				t_mini;
 
+typedef struct	s_expansions
+{
+	char			*new_arg;
+	int				i;
+	int				j;
+}				t_expansions;
+
 void	display_prompt();
-void	shell_loop();
+void	shell_loop(t_mini *mini);
 int		ignore_sep(char *line, int i);
 void	ft_skip_space(const char *str, int *i);
 void	ft_skip_space(const char *str, int *i);
@@ -112,6 +138,19 @@ int	env_init(t_mini *mini, char **env_array);
 int	secret_env_init(t_mini *mini, char **env_array);
 void				increment_shell_level(t_env *env);
 char	*get_env_value(char *arg, t_env *env);
-void	get_env_name(char *name, const char *env);
+char		*get_env_name(char *dest, const char *src);
+char	*get_var_value(const char *arg, int pos, t_env *env, int ret);
+int		arg_alloc_len(const char *arg, t_env *env, int ret);
+void		print_sorted_env(t_env *env);
+int	is_valid_env(const char *env);
+char	*env_to_str(t_env *lst);
+void split_key_value(const char *env_str, char **key, char **value);
+
+
+//builtin_functions
+
+int     ft_env(t_env *env);
+int			ft_export(char **args, t_env *env, t_env *secret);
+
 
 #endif

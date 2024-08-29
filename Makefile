@@ -1,8 +1,9 @@
 NAME = minishell
 CC = gcc
 FLAGS = -Wall -Werror -Wextra
-SRCS = try.c load_shell.c tokens.c tokens_utils.c\
-		get_env.c env.c shlvl.c
+SRCS = main.c load_shell.c tokens.c tokens_utils.c\
+		get_env.c env.c shlvl.c expansions.c expansions_utils.c\
+		env_fuc.c export_fuc.c print_sort.c
 
 LDFLAGS = -lreadline
 LIBFT = ./libft/libft.a
