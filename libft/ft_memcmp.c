@@ -34,7 +34,7 @@ int	ft_memcmp(const void *s1, const void *s2, size_t n)
 
 // int main()
 // {
-//     char str1[] = "Hello";
+//     char str1[] = "";
 //     char str2[] = "World";
 //     int result;
 

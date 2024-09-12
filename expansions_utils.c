@@ -1,90 +1,88 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   expansions_utils.c                                 :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/12 12:39:54 by achamsin          #+#    #+#             */
+/*   Updated: 2024/09/12 12:39:56 by achamsin         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
+#include <stddef.h>
 
-int		ret_size(int ret)
+size_t	dollar_sign(char *str)
 {
-	char	*tmp;
-	int		ret_len;
-
-	tmp = ft_itoa(ret);
-	ret_len = ft_strlen(tmp);
-	ft_memdel(tmp);
-	return (ret_len);
-}
-
-int		get_var_len(const char *arg, int pos, t_env *env, int ret)
-{
-	char	var_name[BUFF_SIZE];
-	char	*var_value;
-	int		i;
+	size_t	i;
 
 	i = 0;
-	if (arg[pos] == '?')
-		return (ret_size(ret));
-	if (ft_isdigit(arg[pos]))
-		return (0);
-	while (arg[pos] && is_env_char(arg[pos]) == 1 && i < BUFF_SIZE)
+	while (str[i])
 	{
-		var_name[i] = arg[pos];
-		pos++;
+		if (str[i] == '$')
+			return (i + 1);
 		i++;
 	}
-	var_name[i] = '\0';
-	var_value = get_env_value(var_name, env);
-	i = ft_strlen(var_value);
-	ft_memdel(var_value);
+	return (0);
+}
+
+char	*char_to_str(char c)
+{
+	char	*str;
+
+	str = ft_calloc(sizeof(char), 2);
+	str[0] = c;
+	return (str);
+}
+
+int	after_dol_lenght(char *str, int j)
+{
+	int	i;
+
+	i = j + 1;
+	while (str[i] != '\0' && str[i] != '$' && str[i] != ' '
+		&& str[i] != '\"' && str[i] != '\'' && str[i] != '=' && str[i] != '-'
+		&& str[i] != ':')
+		i++;
 	return (i);
 }
 
-int		arg_alloc_len(const char *arg, t_env *env, int ret)
+size_t	quotes_lenght(char *str)
 {
 	int		i;
-	int		size;
-
-	i = -1;
-	size = 0;
-	while (arg[++i])
-	{
-		if (arg[i] == EXPANSION)
-		{
-			i++;
-			if ((arg[i] == '\0' || ft_isalnum(arg[i]) == 0) && arg[i] != '?')
-				size++;
-			else
-				size += get_var_len(arg, i, env, ret);
-			if (ft_isdigit(arg[i]) == 0)
-			{
-				while (arg[i + 1] && is_env_char(arg[i]))
-					i++;
-			}
-			else
-				size--;
-		}
-		size++;
-	}
-	return (size);
-}
-
-char	*get_var_value(const char *arg, int pos, t_env *env, int ret)
-{
-	char	var_name[BUFF_SIZE];
-	char	*var_value;
-	int		i;
+	size_t	ret;
 
 	i = 0;
-	if (arg[pos] == '?')
+	ret = 0;
+	while (str[i])
 	{
-		var_value = ft_itoa(ret);
-		return (var_value);
-	}
-	if (ft_isdigit(arg[pos]))
-		return (NULL);
-	while (arg[pos] && is_env_char(arg[pos]) == 1 && i < BUFF_SIZE)
-	{
-		var_name[i] = arg[pos];
-		pos++;
+		if (str[i] == '\'' || str[i] == '\"')
+		{
+			ret++;
+		}
 		i++;
 	}
-	var_name[i] = '\0';
-	var_value = get_env_value(var_name, env);
-	return (var_value);
+	return (ret);
+}
+
+char	*delete_quotes(char *str, char c)
+{
+	int	i;
+	int	j;
+
+	i = 0;
+	j = 0;
+	while (str[i])
+	{
+		if (str[i] == c)
+		{
+			j = 0;
+			while (str[i + j] == c)
+				j++;
+			ft_strlcpy(&str[i], &str[i + j], strlen(str) - i);
+		}
+		i++;
+	}
+	return (str);
 }

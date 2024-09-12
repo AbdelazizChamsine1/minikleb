@@ -68,6 +68,6 @@ void			ft_lstiter(t_list *lst, void (*f)(void*));
 void			ft_lstclear(t_list **lst, void (*del)(void *));
 void			ft_skip_spacenl(const char *str, int *i);
 void			ft_putstr(char *str);
-
+char			*ft_strstr(char *str, char *to_find);
 
 #endif

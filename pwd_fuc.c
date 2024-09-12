@@ -1,20 +1,35 @@
 /* ************************************************************************** */
 /*                                                                            */
 /*                                                        :::      ::::::::   */
-/*   ft_skip_spacenl.c                                  :+:      :+:    :+:   */
+/*   pwd_fuc.c                                          :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
 /*   By: oismail <marvin@42.fr>                     +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/03 15:28:54 by oismail           #+#    #+#             */
-/*   Updated: 2024/09/03 15:30:56 by oismail          ###   ########.fr       */
+/*   Created: 2024/09/03 16:31:09 by oismail           #+#    #+#             */
+/*   Updated: 2024/09/03 16:33:35 by oismail          ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
-#include "libft.h"
+#include "minishell.h"
 
-void	ft_skip_spacenl(const char *str, int *i)
+void	ft_pwd(void)
 {
-	while ((str[*i] == ' ' || str[*i] == '\t' || str[*i] == '\n')
-		|| (str[*i] == '\r' || str[*i] == '\v' || str[*i] == '\f'))
-		(*i)++;
+	char	*buff;
+	char	*ptr;
+
+	buff = (char *)malloc(sizeof(char) * (BUFF_SIZE + 1));
+	if (!buff)
+	{
+		printf("memory allocation failed");
+		return ;
+	}
+	ptr = getcwd(buff, BUFF_SIZE);
+	if (!ptr)
+	{
+		free(buff);
+		return ;
+	}
+	write(1, buff, ft_strlen(buff));
+	write(1, "\n", 1);
+	free(buff);
 }

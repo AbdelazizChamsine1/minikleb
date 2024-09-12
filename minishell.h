@@ -3,10 +3,10 @@
 /*                                                        :::      ::::::::   */
 /*   minishell.h                                        :+:      :+:    :+:   */
 /*                                                    +:+ +:+         +:+     */
-/*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
+/*   By: marvin <marvin@student.42.fr>              +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 14:13:19 by achamsin          #+#    #+#             */
-/*   Updated: 2024/08/29 10:00:46 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/09/10 21:59:14 by marvin           ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -44,17 +44,18 @@
 typedef struct s_token
 {
 	char			*str;
-	int				quotype;
 	int				type;
 	struct s_token	*prev;
 	struct s_token	*next;
 }				t_token;
 
-// typedef struct s_env
-// {
-// 	char			*value;
-// 	struct s_env	*next;
-// }				t_env;
+typedef struct	s_sig
+{
+	int				sigint;
+	int				sigquit;
+	int				exit_status;
+	pid_t			pid;
+}				t_sig;
 
 typedef enum e_tokens
 {
@@ -112,6 +113,7 @@ typedef struct	s_mini
 	int				last;
 	int				ret;
 	int				exit;
+	int				error_num;
 	int				no_exec;
 }				t_mini;
 
@@ -126,12 +128,14 @@ void	display_prompt();
 void	shell_loop(t_mini *mini);
 int		ignore_sep(char *line, int i);
 void	ft_skip_space(const char *str, int *i);
+int	check_quotes(const char *input);
 void	ft_skip_space(const char *str, int *i);
 void	type_arg(t_token *token, int separator);
 void	display_tokens(t_token *token);
 
 //ENV
 int		is_env_char(int c);
+int	ft_secret_env(t_env *env);
 // void	squish_args(t_mini *mini);
 t_token	*get_tokens(char *line);
 int	env_init(t_mini *mini, char **env_array);
@@ -145,12 +149,51 @@ void		print_sorted_env(t_env *env);
 int	is_valid_env(const char *env);
 char	*env_to_str(t_env *lst);
 void split_key_value(const char *env_str, char **key, char **value);
-
+char *expander_str(t_mini *mini, char *str);
+char **expander(t_mini *mini, char **str);
+size_t	equal_sign(char *str);
+int	after_dol_lenght(char *str, int j);
+int	question_mark(t_mini *mini, char **tmp);
+size_t	quotes_lenght(char *str);
+char	*delete_quotes(char *str, char c);
+size_t	dollar_sign(char *str);
+char	*char_to_str(char c);
 
 //builtin_functions
 
 int     ft_env(t_env *env);
-int			ft_export(char **args, t_env *env, t_env *secret);
+int	ft_export(char **args, t_env **env, t_env **secret);
+int ft_unset(char **args, t_env **env);
+void    ft_pwd();
+int cd_home(t_mini *mini);
+int update_oldpwd(t_mini *mini);
+int update_pwd(t_mini *mini);
+int cd_file(t_mini *mini, char *path);
+char    *ft_pwd1();
+int cd_last(t_mini *mini);
+int cd_dash(t_mini *mini);
+char	**cmd_tab(t_token *start);
+int				ft_echo(char **args);
+int is_mixed(char *str);
+int exec_bin(char **args, t_env *env, t_mini *mini);
 
+//FREE
+void	free_tab(char **tab);
+void	free_env(t_env *env);
+void	free_token(t_token *start);
 
+//FD
+void	ft_close(int fd);
+void	reset_std(t_mini *mini);
+void	close_fds(t_mini *mini);
+void	reset_fds(t_mini *mini);
+
+//TYPE
+int		is_type(t_token *token, int type);
+int		is_types(t_token *token, char *types);
+int		has_type(t_token *token, int type);
+int		has_pipe(t_token *token);
+t_token	*next_type(t_token *token, int type, int skip);
+
+extern t_sig g_sig;
 #endif

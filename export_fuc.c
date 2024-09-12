@@ -6,9 +6,9 @@ static int	print_error(int error, const char *arg)
 	int		i;
 
 	if (error == -1)
-		ft_putstr_fd("export: not valid in this context: ", STDERR);
+		ft_putstr_fd("bash : export: not valid in this context: ", STDERR);
 	else if (error == 0 || error == -3)
-		ft_putstr_fd("export: not a valid identifier: ", STDERR);
+		ft_putstr_fd("bash : export: not a valid identifier: ", STDERR);
 	i = 0;
 	while (arg[i] && (arg[i] != '=' || error == -3))
 	{
@@ -76,51 +76,100 @@ char		*get_env_name(char *dest, const char *src)
 	return (dest);
 }
 
-int			is_in_env(t_env *env, char *args)
+int	is_in_env(t_env **env, char *args)
 {
 	char	var_name[BUFF_SIZE];
 	char	env_name[BUFF_SIZE];
+	char	*value;
+	t_env	*current;
 
 	get_env_name(var_name, args);
-	while (env && env->next)
+	value = ft_strchr(args, '=');
+	if (value)
+		value++;
+	current = *env;
+	while (current)
 	{
-		get_env_name(env_name, env->value);
+		get_env_name(env_name, current->key);
 		if (ft_strcmp(var_name, env_name) == 0)
 		{
-			ft_memdel(env->value);
-			env->value = ft_strdup(args);
+			ft_memdel(current->value);
+			if (value)
+				current->value = ft_strdup(value);
 			return (1);
 		}
-		env = env->next;
+		current = current->next;
 	}
-	return (SUCCESS);
+	return (0);
 }
 
-int			ft_export(char **args, t_env *env, t_env *secret)
+// int	ft_export(char **args, t_env **env, t_env **secret)
+// {
+// 	int		new_env;
+// 	int		error_ret;
+
+// 	new_env = 0;
+// 	if (!args[1])
+// 	{
+// 		ft_secret_env(*secret);
+// 		return (SUCCESS);
+// 	}
+// 	else
+// 	{
+// 		error_ret = is_valid_env(args[1]);
+// 		if (args[1][0] == '=')
+// 			error_ret = -3;
+
+// 		if (error_ret <= 0)
+// 			return (print_error(error_ret, args[1]));
+
+// 		new_env = error_ret == 2 ? 1 : is_in_env(env, args[1]);
+// 		if (new_env == 0)
+// 			if (error_ret == 1)
+// 				env_add(args[1], env);
+// 		new_env = is_in_env(secret, args[1]);
+// 		if(new_env == 0)
+// 			env_add(args[1], secret);
+// 	}
+// 	return (SUCCESS);
+// }
+
+int	ft_export(char **args, t_env **env, t_env **secret)
 {
 	int		new_env;
 	int		error_ret;
+	int		i;
 
-	new_env = 0;
 	if (!args[1])
 	{
-		print_sorted_env(secret);
+		ft_secret_env(*secret);
 		return (SUCCESS);
-    }
-	else
+	}
+	i = 1;
+	while (args[i])
 	{
-		error_ret = is_valid_env(args[1]);
-		if (args[1][0] == '=')
+		error_ret = is_valid_env(args[i]);
+		if (args[i][0] == '=')
 			error_ret = -3;
 		if (error_ret <= 0)
-			return (print_error(error_ret, args[1]));
-		new_env = error_ret == 2 ? 1 : is_in_env(env, args[1]);
+		{
+			print_error(error_ret, args[i]);
+			i++;
+			continue ;
+		}
+		new_env = error_ret == 2 ? 1 : is_in_env(env, args[i]);
 		if (new_env == 0)
 		{
 			if (error_ret == 1)
-				env_add(args[1], &env);
-			env_add(args[1], &secret);
+				env_add(args[i], env);
 		}
+		new_env = is_in_env(secret, args[i]);
+		if (new_env == 0)
+		{
+			env_add(args[i], secret);
+		}
+
+		i++;
 	}
 	return (SUCCESS);
 }
