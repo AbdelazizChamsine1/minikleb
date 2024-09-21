@@ -6,7 +6,7 @@
 /*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/06/12 11:24:40 by achamsin          #+#    #+#             */
-/*   Updated: 2024/06/12 11:51:55 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/09/21 12:14:23 by achamsin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -53,6 +53,6 @@ char	*ft_strtrim(char const *s1, char const *set)
 
 // int main()
 // {
-// 	printf("%s", ft_strtrim(" -+ - hell-l+lo + - -", " -+"));
+// 	printf("%s", ft_strtrim(" -+ - hell-l+lo + - -", " lo"));
 // 	return (0);
 // }

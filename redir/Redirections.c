@@ -1,115 +1,76 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   Redirections.c                                     :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2020/06/17 15:47:34 by cclaude           #+#    #+#             */
+/*   Updated: 2024/09/21 15:45:27 by achamsin         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-int check_append_outfile(t_token *redirection)
+void	redir(t_mini *mini, t_token *token, int type)
 {
-    int fd;
-
-    if (redirection->type == TOKEN_APPEND)
-        fd = open(redirection->str, O_CREAT | O_RDWR | O_APPEND, 0644);
-    else if (redirection-> type == TOKEN_TRUNC)
-        fd = open(redirection->str, O_CREAT | O_RDWR | O_TRUNC, 0644);
-    return fd;
+	ft_close(mini->fdout);
+	if (type == TOKEN_TRUNC)
+		mini->fdout = open(token->str, O_CREAT | O_WRONLY | O_TRUNC, 00700);
+	else
+		mini->fdout = open(token->str, O_CREAT | O_WRONLY | O_APPEND, 00700);
+	if (mini->fdout == -1)
+	{
+		ft_putstr_fd("minishell: ", STDERR);
+		ft_putstr_fd(token->str, STDERR);
+		ft_putendl_fd(": No such file or directory", STDERR);
+		mini->ret = 1;
+		mini->no_exec = 1;
+		return ;
+	}
+	dup2(mini->fdout, STDOUT);
 }
 
-int handle_infile(char *file)
+void	input(t_mini *mini, t_token *token)
 {
-    if (file == NULL)
-    {
-        ft_putstr_fd("minishell: infile: NULL file name\n", STDERR_FILENO);
-        return (EXIT_FAILURE);
-    }
-
-    int fd = open(file, O_RDONLY);
-    if (fd < 0)
-    {
-        ft_putstr_fd("minishell: infile: No such file or directory\n", STDERR_FILENO);
-        return (EXIT_FAILURE);
-    }
-
-    if (dup2(fd, STDIN_FILENO) < 0)
-    {
-        ft_putstr_fd("minishell: pipe error\n", STDERR_FILENO);
-        close(fd);
-        return (EXIT_FAILURE);
-    }
-    close(fd);
-    
-    return (EXIT_SUCCESS);
+	ft_close(mini->fdin);
+	mini->fdin = open(token->str, O_RDONLY, 00700);
+	if (mini->fdin == -1)
+	{
+		ft_putstr_fd("minishell: ", STDERR);
+		ft_putstr_fd(token->str, STDERR);
+		ft_putendl_fd(": No such file or directory", STDERR);
+		mini->ret = 1;
+		mini->no_exec = 1;
+		return ;
+	}
+	dup2(mini->fdin, STDIN);
 }
 
-int handle_outfile(t_token *redirection, int append)
+int		minipipe(t_mini *mini)
 {
-    int fd;
+	pid_t	pid;
+	int		pipefd[2];
 
-    if (append)
-        fd = open(redirection->str, O_WRONLY | O_CREAT | O_APPEND, 0644);
-    else
-        fd = open(redirection->str, O_WRONLY | O_CREAT | O_TRUNC, 0644);
-
-    if (fd < 0) {
-        perror("open");
-        return EXIT_FAILURE;
-    }
-    dup2(fd, STDOUT_FILENO);
-    close(fd);
-    return EXIT_SUCCESS;
-}
-
-
-int check_redirections(t_mini *mini)
-{
-    t_token *current;
-
-    if (!mini)
-    {
-        ft_putstr_fd("Error: mini is NULL\n", STDERR_FILENO);
-        return (EXIT_FAILURE);
-    }
-
-    current = mini->start;
-    while (current)
-    {
-        if (current->str == NULL)
-        {
-            ft_putstr_fd("Error: current->str is NULL. Skipping this token.\n", STDERR_FILENO);
-            current = current->next;
-            continue;
-        }
-
-        if (current->type == TOKEN_IN)
-        {
-            if (current->next == NULL || current->next->str == NULL)
-            {
-                ft_putstr_fd("Error: Missing file for input redirection\n", STDERR_FILENO);
-                return (EXIT_FAILURE);
-            }
-            if (handle_infile(current->next->str))
-            {
-                ft_putstr_fd("Error: Failed to handle infile for: ", STDERR_FILENO);
-                ft_putstr_fd(current->next->str, STDERR_FILENO);
-                ft_putstr_fd("\n", STDERR_FILENO);
-                return (EXIT_FAILURE);
-            }
-            current = current->next; // Skip the file name token
-        }
-        else if (current->type == TOKEN_OUT || current->type == TOKEN_APPEND)
-        {
-            if (current->next == NULL || current->next->str == NULL)
-            {
-                ft_putstr_fd("Error: Missing file for output redirection\n", STDERR_FILENO);
-                return (EXIT_FAILURE);
-            }
-            if (handle_outfile(current->next, current->type == TOKEN_APPEND))
-            {
-                ft_putstr_fd("Error: Failed to handle outfile for: ", STDERR_FILENO);
-                ft_putstr_fd(current->next->str, STDERR_FILENO);
-                ft_putstr_fd("\n", STDERR_FILENO);
-                return (EXIT_FAILURE);
-            }
-            current = current->next; // Skip the file name token
-        }
-        current = current->next;
-    }
-
-    return (EXIT_SUCCESS);
+	pipe(pipefd);
+	pid = fork();
+	if (pid == 0)
+	{
+		ft_close(pipefd[1]);
+		dup2(pipefd[0], STDIN);
+		mini->pipin = pipefd[0];
+		mini->pid = -1;
+		mini->parent = 0;
+		mini->no_exec = 0;
+		return (2);
+	}
+	else
+	{
+		ft_close(pipefd[0]);
+		dup2(pipefd[1], STDOUT);
+		mini->pipout = pipefd[1];
+		mini->pid = pid;
+		mini->last = 0;
+		return (1);
+	}
 }

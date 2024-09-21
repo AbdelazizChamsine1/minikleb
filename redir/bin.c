@@ -37,10 +37,8 @@ int magic_box(char *path, char **args, t_env *env, t_mini *mini) {
 
     ret = SUCCESS;
     g_sig.pid = fork();
-    if (g_sig.pid == 0) {
-		if (check_redirections(mini) == ERROR) {
-			return ERROR;
-		}
+    if (g_sig.pid == 0)
+	{
         ptr = env_to_str(env);
         env_array = ft_split(ptr, '\n');
         ft_memdel(ptr);
@@ -51,14 +49,11 @@ int magic_box(char *path, char **args, t_env *env, t_mini *mini) {
         free_tab(env_array);
         free_token(mini->start);
         exit(ret);
-    } else {
+    }
+	else
         waitpid(g_sig.pid, &ret, 0);
-    }
-
-    if (g_sig.sigint == 1 || g_sig.sigquit == 1) {
+    if (g_sig.sigint == 1 || g_sig.sigquit == 1)
         return g_sig.exit_status;
-    }
-
     ret = (ret == 32256 || ret == 32512) ? ret / 256 : !!ret;
     return ret;
 }

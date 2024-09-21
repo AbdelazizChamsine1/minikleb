@@ -6,7 +6,7 @@
 /*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 13:46:35 by achamsin          #+#    #+#             */
-/*   Updated: 2024/08/27 13:56:43 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/09/21 14:12:28 by achamsin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -38,7 +38,7 @@ void	ft_skip_space(const char *str, int *i)
 void	type_arg(t_token *token, int separator)
 {
 	if (ft_strcmp(token->str, "") == 0)
-		token->type = TOKEN_EOF;
+		token->type = TOKEN_EMPTY;
 	else if (ft_strcmp(token->str, ">") == 0 && separator == 0)
 		token->type = TOKEN_TRUNC;
 	else if (ft_strcmp(token->str, ">>") == 0 && separator == 0)
@@ -49,8 +49,10 @@ void	type_arg(t_token *token, int separator)
 		token->type = TOKEN_HEREDOC;
 	else if (ft_strcmp(token->str, "|") == 0 && separator == 0)
 		token->type = TOKEN_PIPE;
+	else if (ft_strcmp(token->str, ";") == 0 && separator == 0)
+		token->type = TOKEN_EOF;
 	else if (token->prev == NULL || token->prev->type >= TOKEN_TRUNC)
-		token->type = TOKEN_WORD;
+		token->type = TOKEN_CMD;
 	else
-		token->type = TOKEN_WORD;
+		token->type = TOKEN_ARG;
 }

@@ -6,7 +6,7 @@
 /*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 11:31:18 by achamsin          #+#    #+#             */
-/*   Updated: 2024/09/12 12:53:43 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/09/21 15:27:20 by achamsin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -74,9 +74,7 @@ void handle_input(char *input, t_mini *mini, char **args) {
     mini->start = tokens;
     cmds = divide_pipe(mini);
 
-    printf("Tokens from t_simple list:\n");
-    display_simple_tokens(cmds);
-    if (is_built(cmd_args)) {
+    if (is_builtin(cmd_args)) {
         builtin_fuc(mini, cmd_args, input);
     } else if (strcmp(args[0], "clear") == 0) {
         system("clear");
@@ -84,11 +82,6 @@ void handle_input(char *input, t_mini *mini, char **args) {
         return;
     } else {
         mini->ret = exec_bin(cmd_args, mini->env, mini);
-        if (mini->ret == UNKNOWN_COMMAND) {
-            ft_putstr_fd("Error: Command not found: ", STDERR_FILENO);
-            ft_putstr_fd(cmd_args[0], STDERR_FILENO);
-            ft_putstr_fd("\n", STDERR_FILENO);
-        }
     }
     t_simple *temp;
     while (cmds) {

@@ -1,33 +1,33 @@
 #include "minishell.h"
 
-char	**cmd_tab(t_token *start)
-{
-	t_token	*token;
-	char	**tab;
-	int		i;
+// char	**cmd_tab(t_token *start)
+// {
+// 	t_token	*token;
+// 	char	**tab;
+// 	int		i;
 
-	if (!start)
-		return (NULL);
-	token = start->next;
-	i = 2;
-	while (token)
-	{
-		token = token->next;
-		i++;
-	}
-	if (!(tab = malloc(sizeof(char *) * i)))
-		return (NULL);
-	token = start->next;
-	tab[0] = start->str;
-	i = 1;
-	while (token)
-	{
-		tab[i++] = token->str;
-		token = token->next;
-	}
-	tab[i] = NULL;
-	return (tab);
-}
+// 	if (!start)
+// 		return (NULL);
+// 	token = start->next;
+// 	i = 2;
+// 	while (token)
+// 	{
+// 		token = token->next;
+// 		i++;
+// 	}
+// 	if (!(tab = malloc(sizeof(char *) * i)))
+// 		return (NULL);
+// 	token = start->next;
+// 	tab[0] = start->str;
+// 	i = 1;
+// 	while (token)
+// 	{
+// 		tab[i++] = token->str;
+// 		token = token->next;
+// 	}
+// 	tab[i] = NULL;
+// 	return (tab);
+// }
 
 void expand_d(t_mini *mini, char **str)
 {

@@ -21,13 +21,16 @@ SRCS = main.c \
        expansion/expansions1.c \
        redir/bin.c \
        redir/pipe_divide.c \
-       redir/red_divide.c \
        redir/Redirections.c \
        token/token.c \
        token/tokens_utils.c \
        utils/fd.c \
        utils/free.c \
        utils/type.c \
+       utils/token.c \
+       utils/builtin.c \
+       utils/expn.c \
+       utils/expn_t.c \
        exec.c  # Removed the duplicate load_shell.c
 
 LDFLAGS = -lreadline

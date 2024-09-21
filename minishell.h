@@ -6,7 +6,7 @@
 /*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
 /*                                                +#+#+#+#+#+   +#+           */
 /*   Created: 2024/08/27 14:13:19 by achamsin          #+#    #+#             */
-/*   Updated: 2024/09/21 11:02:28 by achamsin         ###   ########.fr       */
+/*   Updated: 2024/09/21 16:06:52 by achamsin         ###   ########.fr       */
 /*                                                                            */
 /* ************************************************************************** */
 
@@ -71,13 +71,14 @@ typedef struct	s_sig
 
 typedef enum e_tokens
 {
-	TOKEN_PIPE,
+	TOKEN_EMPTY,
+	TOKEN_CMD,
+	TOKEN_ARG,
 	TOKEN_TRUNC,
-	TOKEN_WORD,
-	TOKEN_IN,
-	TOKEN_OUT,
-	TOKEN_HEREDOC,
 	TOKEN_APPEND,
+	TOKEN_IN,
+	TOKEN_PIPE,
+	TOKEN_HEREDOC,
 	TOKEN_EOF
 }	t_tokens;
 
@@ -117,6 +118,36 @@ typedef struct	s_expansions
 	int				j;
 }				t_expansions;
 
+//////////////////////////////////UTILS//////////////////////////////////////
+
+//FREE
+void	free_tab(char **tab);
+void	free_env(t_env *env);
+void	free_token(t_token *start);
+
+//FD
+void	ft_close(int fd);
+void	reset_std(t_mini *mini);
+void	close_fds(t_mini *mini);
+void	reset_fds(t_mini *mini);
+
+//TOKEN
+t_token	*next_sep(t_token *token, int skip);
+t_token	*prev_sep(t_token *token, int skip);
+t_token	*next_run(t_token *token, int skip);
+
+//TYPE
+int		is_type(t_token *token, int type);
+int		is_types(t_token *token, char *types);
+int		has_type(t_token *token, int type);
+int		has_pipe(t_token *token);
+t_token	*next_type(t_token *token, int type, int skip);
+
+//expantions
+char	*get_var_value(const char *arg, int pos, t_env *env, int ret);
+int		arg_alloc_len(const char *arg, t_env *env, int ret);
+char	*expansions(char *arg, t_env *env, int ret);
+/////////////////////////////////UTILS/////////////////////////////////////
 void	shell_loop(t_mini *mini);
 int		ignore_sep(char *line, int i);
 void	ft_skip_space(const char *str, int *i);
@@ -164,30 +195,8 @@ char	**cmd_tab(t_token *start);
 int		ft_echo(char **args);
 int 	exec_bin(char **args, t_env *env, t_mini *mini);
 
-//FREE
-void	free_tab(char **tab);
-void	free_env(t_env *env);
-void	free_token(t_token *start);
-
-//FD
-void	ft_close(int fd);
-void	reset_std(t_mini *mini);
-void	close_fds(t_mini *mini);
-void	reset_fds(t_mini *mini);
-
-//TYPE
-int		is_type(t_token *token, int type);
-int		is_types(t_token *token, char *types);
-int		has_type(t_token *token, int type);
-t_token	*next_type(t_token *token, int type, int skip);
-
-// int redirect_out(t_mini *mini);
-// int redirect_in(t_mini  *mini);
-// int redir_and_exec(t_mini *mini, t_token *token);
-// void	exec_cmd(t_mini *mini, t_token *token);
 void		builtin_fuc(t_mini *mini, char **args, char *trimmed_input);
-int 		is_built(char **args);
-int 		check_redirections(t_mini *mini);
+int 		is_builtin(char **args);
 void		expand_d(t_mini *mini, char **str);
 t_simple 	*divide_pipe(t_mini *mini);
 extern	t_sig g_sig;

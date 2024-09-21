@@ -1,80 +1,70 @@
+/* ************************************************************************** */
+/*                                                                            */
+/*                                                        :::      ::::::::   */
+/*   exec.c                                             :+:      :+:    :+:   */
+/*                                                    +:+ +:+         +:+     */
+/*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
+/*                                                +#+#+#+#+#+   +#+           */
+/*   Created: 2024/09/21 15:25:40 by achamsin          #+#    #+#             */
+/*   Updated: 2024/09/21 15:25:40 by achamsin         ###   ########.fr       */
+/*                                                                            */
+/* ************************************************************************** */
+
 #include "minishell.h"
 
-void builtin_fuc(t_mini *mini, char **args, char *trimmed_input)
+char	**cmd_tab(t_token *start)
 {
-    t_token *tokens;
-    char **expanded_args;
-    int i;
+	t_token	*token;
+	char	**tab;
+	int		i;
 
-    if (ft_strcmp(args[0], "exit") == 0)
-    {
-        free_tab(args);
-        exit(0);
-    }
-    else if (ft_strcmp(args[0], "echo") == 0) {
-        i = 0;
-        while (args[i] != NULL) {
-            if (ft_strchr(args[i], '$') != NULL) {
-                expand_d(mini, &args[i]);
-            }
-            i++;
-        }
-        args = expander(mini, args);
-        tokens = get_tokens(trimmed_input);
-        expanded_args = cmd_tab(tokens);
-        ft_echo(args);
-        free_tab(expanded_args);
-        free_tab(args);
-        return;
-    }
-    else if (ft_strcmp(args[0], "env") == 0)
-    {
-        ft_env(mini->env);
-        return ;
-    }
-    else if (ft_strcmp(args[0], "unset") == 0)
+	if (!start)
+		return (NULL);
+	token = start->next;
+	i = 2;
+	while (token && token->type < TOKEN_TRUNC)
 	{
-		ft_unset(args, &mini->env);
-        ft_unset(args, &mini->secret_env);
-        return;
+		token = token->next;
+		i++;
 	}
-    else if (ft_strcmp(args[0], "cd") == 0)
-    {
-		if (args[2])
-		{
-			printf("too many arguments\n");
-			return ;
-		}
-        cd_file(mini, args[1]);
-        return;
-    }
-    else if (ft_strcmp(args[0], "export") == 0)
-    {
-        ft_export(args, &mini->env, &mini->secret_env);
-        return;
-    }
-    else if (ft_strcmp(args[0], "pwd") == 0)
-    {
-        ft_pwd();
-        return;
-    }
+	if (!(tab = malloc(sizeof(char *) * i)))
+		return (NULL);
+	token = start->next;
+	tab[0] = start->str;
+	i = 1;
+	while (token && token->type < TOKEN_TRUNC)
+	{
+		tab[i++] = token->str;
+		token = token->next;
+	}
+	tab[i] = NULL;
+	return (tab);
 }
 
-int is_built(char **args)
+void	exec_cmd(t_mini *mini, t_token *token, char *trimmed_input)
 {
-    if (ft_strcmp(args[0], "pwd") == 0)
-        return (1);
-    else if (ft_strcmp(args[0], "env") == 0)
-        return (1);
-    else if (ft_strcmp(args[0], "echo") == 0)
-        return (1);
-    else if (ft_strcmp(args[0], "cd") == 0)
-        return (1);
-    else if (ft_strcmp(args[0], "export") == 0)
-        return (1);
-    else if (ft_strcmp(args[0], "unset") == 0)
-        return (1);
-    else if (ft_strcmp(args[0], "exit") == 0)
-        return (1);
-    return (0);
+	char	**cmd;
+	int		i;
+
+	if (mini->charge == 0)
+		return ;
+	cmd = cmd_tab(token);
+	i = 0;
+	while (cmd && cmd[i])
+	{
+		cmd[i] = expansions(cmd[i], mini->env, mini->ret);
+		i++;
+	}
+	if (cmd && ft_strcmp(cmd[0], "exit") == 0 && has_pipe(token) == 0)
+		exit(0);
+	if (cmd && is_builtin(cmd))
+		mini->ret = builtin_fuc(mini, cmd, trimmed_input);
+	else if (cmd)
+		mini->ret = exec_bin(cmd, mini->env, mini);
+	free_tab(cmd);
+	ft_close(mini->pipin);
+	ft_close(mini->pipout);
+	mini->pipin = -1;
+	mini->pipout = -1;
+	mini->charge = 0;
 }
