@@ -22,7 +22,7 @@ static int	delete_node(t_env **env, const char *value)
 	deleted = 0;
 	temp = *env;
 	prev = NULL;
-	get_env_name(key, value);
+	get_env_name1(key, value);
 	while (temp != NULL)
 	{
 		if (ft_strcmp(temp->key, key) == 0)

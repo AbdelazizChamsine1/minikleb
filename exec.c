@@ -1,65 +1,80 @@
-
-
 #include "minishell.h"
 
-void	handle_pipe_execution(t_mini *mini, t_token *token)
+void builtin_fuc(t_mini *mini, char **args, char *trimmed_input)
 {
-    int pipe_fd[2];
-    pid_t pid;
+    t_token *tokens;
+    char **expanded_args;
+    int i;
 
-    if (pipe(pipe_fd) == -1)
+    if (ft_strcmp(args[0], "exit") == 0)
     {
-        perror("pipe");
-        exit(EXIT_FAILURE);
+        free_tab(args);
+        exit(0);
     }
-    pid = fork();
-    if (pid == 0)
-    {
-        dup2(pipe_fd[1], STDOUT_FILENO);
-        close(pipe_fd[0]);
-        close(pipe_fd[1]);
-        exec_cmd(mini, token);
-    }
-    else
-    {
-        dup2(pipe_fd[0], STDIN_FILENO);
-        close(pipe_fd[1]);
-        close(pipe_fd[0]);
-
-        t_token *next_command = next_type(token, TOKEN_PIPE, 1);
-        if (next_command)
-        {
-            exec_cmd(mini, next_command);
+    else if (ft_strcmp(args[0], "echo") == 0) {
+        i = 0;
+        while (args[i] != NULL) {
+            if (ft_strchr(args[i], '$') != NULL) {
+                expand_d(mini, &args[i]);
+            }
+            i++;
         }
+        args = expander(mini, args);
+        tokens = get_tokens(trimmed_input);
+        expanded_args = cmd_tab(tokens);
+        ft_echo(args);
+        free_tab(expanded_args);
+        free_tab(args);
+        return;
+    }
+    else if (ft_strcmp(args[0], "env") == 0)
+    {
+        ft_env(mini->env);
+        return ;
+    }
+    else if (ft_strcmp(args[0], "unset") == 0)
+	{
+		ft_unset(args, &mini->env);
+        ft_unset(args, &mini->secret_env);
+        return;
+	}
+    else if (ft_strcmp(args[0], "cd") == 0)
+    {
+		if (args[2])
+		{
+			printf("too many arguments\n");
+			return ;
+		}
+        cd_file(mini, args[1]);
+        return;
+    }
+    else if (ft_strcmp(args[0], "export") == 0)
+    {
+        ft_export(args, &mini->env, &mini->secret_env);
+        return;
+    }
+    else if (ft_strcmp(args[0], "pwd") == 0)
+    {
+        ft_pwd();
+        return;
     }
 }
 
-void	exec_cmd(t_mini *mini, t_token *token)
+int is_built(char **args)
 {
-	char	**cmd;
-	int		i;
-
-    if (mini->charge == 0)
-        return ;
-    cmd = cmd_tab(token);
-    i = 0;
-    while (cmd && cmd[i])
-    {
-        cmd[i] = expansions(cmd[i], mini->env, mini->ret);
-        i++;
-    }
-    if (has_pipe(token))
-        handle_pipe_execution(mini, token);
-    else if (cmd && ft_strcmp(cmd[0], "exit") == 0)
-        mini_exit(mini, cmd);
-    else if (cmd && is_builtin(cmd[0]))
-        mini->ret = exec_builtin(cmd, mini);
-    else if (cmd)
-        mini->ret = exec_bin(cmd, mini->env, mini);
-    free_tab(cmd);
-    ft_close(mini->pipin);
-    ft_close(mini->pipout);
-    mini->pipin = -1;
-    mini->pipout = -1;
-    mini->charge = 0;
+    if (ft_strcmp(args[0], "pwd") == 0)
+        return (1);
+    else if (ft_strcmp(args[0], "env") == 0)
+        return (1);
+    else if (ft_strcmp(args[0], "echo") == 0)
+        return (1);
+    else if (ft_strcmp(args[0], "cd") == 0)
+        return (1);
+    else if (ft_strcmp(args[0], "export") == 0)
+        return (1);
+    else if (ft_strcmp(args[0], "unset") == 0)
+        return (1);
+    else if (ft_strcmp(args[0], "exit") == 0)
+        return (1);
+    return (0);
 }

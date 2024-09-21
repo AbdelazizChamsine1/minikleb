@@ -103,37 +103,6 @@ int	is_in_env(t_env **env, char *args)
 	return (0);
 }
 
-// int	ft_export(char **args, t_env **env, t_env **secret)
-// {
-// 	int		new_env;
-// 	int		error_ret;
-
-// 	new_env = 0;
-// 	if (!args[1])
-// 	{
-// 		ft_secret_env(*secret);
-// 		return (SUCCESS);
-// 	}
-// 	else
-// 	{
-// 		error_ret = is_valid_env(args[1]);
-// 		if (args[1][0] == '=')
-// 			error_ret = -3;
-
-// 		if (error_ret <= 0)
-// 			return (print_error(error_ret, args[1]));
-
-// 		new_env = error_ret == 2 ? 1 : is_in_env(env, args[1]);
-// 		if (new_env == 0)
-// 			if (error_ret == 1)
-// 				env_add(args[1], env);
-// 		new_env = is_in_env(secret, args[1]);
-// 		if(new_env == 0)
-// 			env_add(args[1], secret);
-// 	}
-// 	return (SUCCESS);
-// }
-
 int	ft_export(char **args, t_env **env, t_env **secret)
 {
 	int		new_env;

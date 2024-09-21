@@ -2,17 +2,15 @@
 
 void	free_token(t_token *start)
 {
-	while (start && start->next)
-	{
-		ft_memdel(start->str);
-		start = start->next;
-		ft_memdel(start->prev);
-	}
-	if (start)
-	{
-		ft_memdel(start->str);
-		ft_memdel(start);
-	}
+    t_token *temp;
+
+    while (start)
+    {
+        temp = start->next; // Save the next node
+        ft_memdel(start->str); // Free the string in the current node
+        ft_memdel(start); // Free the current node
+        start = temp; // Move to the next node
+    }
 }
 
 void	free_env(t_env *env)

@@ -95,7 +95,6 @@ void	split_key_value(const char *env_str, char **key, char **value)
 	}
 }
 
-
 int	env_init(t_mini *mini, char **env_array)
 {
 	t_env	*env;

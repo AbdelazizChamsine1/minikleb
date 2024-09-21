@@ -1,20 +1,8 @@
-/* ************************************************************************** */
-/*                                                                            */
-/*                                                        :::      ::::::::   */
-/*   bin.c                                              :+:      :+:    :+:   */
-/*                                                    +:+ +:+         +:+     */
-/*   By: achamsin <achamsin@student.42.fr>          +#+  +:+       +#+        */
-/*                                                +#+#+#+#+#+   +#+           */
-/*   Created: 2024/09/12 18:07:34 by achamsin          #+#    #+#             */
-/*   Updated: 2024/09/12 18:07:34 by achamsin         ###   ########.fr       */
-/*                                                                            */
-/* ************************************************************************** */
-
 #include "minishell.h"
 
 t_sig	g_sig;
 
-int	error_message(char *path)
+int			error_message(char *path)
 {
 	DIR	*folder;
 	int	fd;
@@ -42,32 +30,37 @@ int	error_message(char *path)
 	return (ret);
 }
 
-int	magic_box(char *path, char **args, t_env *env, t_mini *mini)
-{
-	char	**env_array;
-	char	*ptr;
-	int		ret;
+int magic_box(char *path, char **args, t_env *env, t_mini *mini) {
+    char **env_array;
+    char *ptr;
+    int ret;
 
-	ret = SUCCESS;
-	g_sig.pid = fork();
-	if (g_sig.pid == 0)
-	{
-		ptr = env_to_str(env);
-		env_array = ft_split(ptr, '\n');
-		ft_memdel(ptr);
-		if (ft_strchr(path, '/') != NULL)
-			execve(path, args, env_array);
-		ret = error_message(path);
-		free_tab(env_array);
-		free_token(mini->start);
-		exit(ret);
-	}
-	else
-		waitpid(g_sig.pid, &ret, 0);
-	if (g_sig.sigint == 1 || g_sig.sigquit == 1)
-		return (g_sig.exit_status);
-	ret = (ret == 32256 || ret == 32512) ? ret / 256 : !!ret;
-	return (ret);
+    ret = SUCCESS;
+    g_sig.pid = fork();
+    if (g_sig.pid == 0) {
+		if (check_redirections(mini) == ERROR) {
+			return ERROR;
+		}
+        ptr = env_to_str(env);
+        env_array = ft_split(ptr, '\n');
+        ft_memdel(ptr);
+        if (ft_strchr(path, '/') != NULL) {
+            execve(path, args, env_array);
+        }
+        ret = error_message(path);
+        free_tab(env_array);
+        free_token(mini->start);
+        exit(ret);
+    } else {
+        waitpid(g_sig.pid, &ret, 0);
+    }
+
+    if (g_sig.sigint == 1 || g_sig.sigquit == 1) {
+        return g_sig.exit_status;
+    }
+
+    ret = (ret == 32256 || ret == 32512) ? ret / 256 : !!ret;
+    return ret;
 }
 
 char	*path_join(const char *s1, const char *s2)
